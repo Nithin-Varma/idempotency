@@ -26,6 +26,7 @@
     "dotenv": "^16.3.1",
     "express-idempotency": "^1.0.5",
     "node-fetch": "^3.3.2",
+    "pino-http": "^8.4.0",
     "uuid": "^9.0.0"
   }
 }
