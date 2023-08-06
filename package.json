@@ -5,7 +5,7 @@
   "main": "src/server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.ts",
+    "start": "nodemon src/server.ts",
     "dev": "nodemon src/server.ts"
   },
   "keywords": [],
@@ -22,6 +22,7 @@
   "dependencies": {
     "axios": "^1.4.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
     "express-idempotency": "^1.0.5",
     "node-fetch": "^3.3.2"
   }
