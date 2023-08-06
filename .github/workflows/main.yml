@@ -1,0 +1,35 @@
+name: Express CI
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: Copy env # copy in your env file
+        run: 'echo -e "${{secrets.ENV}}" > .env'
+      # - run: npm run test
+      - run: npm ci
+      - run: npm run start
+      - run: npm install -g pm2
+      # - run: pm2 start "npm run start:prod" --name "nest"
+      - run: pm2 restart express
+      # - name: Run deploy script
+      #   run: ./.github/scripts/startup.dev.sh
+      #   shell: bash
