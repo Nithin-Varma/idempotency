@@ -3,17 +3,28 @@ import { getSharedIdempotencyService, idempotency } from 'express-idempotency';
 import axios from 'axios';
 import cors from 'cors'
 import env from "dotenv";
-import loggers from "pino-http"
+// import logger from "pino-http"
+import pino from 'pino'
+import expressPino from 'express-pino-logger'
 env.config()
 
 const app = express();
 app.use(express.json());
-app.use(loggers())
 app.use(cors())
 app.use(idempotency());
 
 
+
+
 const PORT = process.env.PORT || 30002;
+
+const logRequest = expressPino(
+  {logger: pino({}, pino.destination('./pe.log')), autoLogging: true,}
+  )
+
+app.use(logRequest)
+
+
 
 app.post('/sepolia', async (req: Request, res: Response, next:NextFunction) => {
     const startTime = Date.now();
@@ -54,6 +65,7 @@ app.post('/sepolia', async (req: Request, res: Response, next:NextFunction) => {
     return res.status(500).send('Internal Server Error');
   }
 });
+
 
 
 app.post('/mumbai', async (req: Request, res: Response, next:NextFunction) => {
