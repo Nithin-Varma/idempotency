@@ -1,8 +1,7 @@
-
-
 import express,{Request,Response} from 'express';
 import { idempotency } from 'express-idempotency';
 import axios from 'axios';
+import cors from 'cors'
 import env from "dotenv";
 env.config()
 
@@ -11,6 +10,7 @@ const cache = new Map();
 const app = express();
 app.use(express.json());
 app.use(idempotency());
+app.use(cors())
 
 const PORT = process.env.PORT || 30002;
 
