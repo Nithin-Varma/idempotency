@@ -5,7 +5,12 @@ import cors from "cors";
 import env from "dotenv";
 import pino from 'pino'
 import expressPino from 'express-pino-logger'
+// import log from 'axios-debug-log'
+
 env.config();
+
+
+
 
 const app = express();
 app.use(express.json());
@@ -14,15 +19,48 @@ app.use(cors());
 app.use(idempotency());
 
 
-
 const PORT = process.env.PORT || 30002;
 
+const logger = pino({}, pino.destination('./pe.log'))
 const logRequest = expressPino(
-  {logger: pino({}, pino.destination('./pe.log')), autoLogging: true,}
+  {logger: logger, autoLogging: true,}
   )
 
 app.use(logRequest)
 
+// const logger = pino({})
+// const alchemyLogger = expressPino({logger})
+// app.use(alchemyLogger)
+
+
+axios.interceptors.request.use(function (config) {
+  //@ts-ignore
+  config["metadata"] = { startTime: new Date() };
+  return config;
+}, function (error) {
+  return Promise.reject(error);
+});
+
+axios.interceptors.response.use(function (response) {
+  //@ts-ignore
+  response.config["metadata"].endTime = new Date();
+  //@ts-ignore
+  const duration = response.config["metadata"].endTime - response.config["metadata"].startTime;
+  logger.info({message :
+    {
+      "url": response.config.url,
+      "duration": duration,
+      "body" : response.data
+    }
+    //  `response time ${duration} from the url ${response.config.url} and the body is ${JSON.stringify(response.data)}`
+  })
+  return response;
+}, function (error) {
+  error.config.metadata.endTime = new Date();
+  const duration = error.config.metadata.endTime - error.config.metadata.startTime;
+  
+  return Promise.reject(error);
+});
 
 
 app.post('/sepolia', async (req: Request, res: Response, next:NextFunction) => {
@@ -58,6 +96,7 @@ app.post('/sepolia', async (req: Request, res: Response, next:NextFunction) => {
       );
       console.log(response.data);
       res.send(response.data);
+  
       next();
     } catch (error) {
       idempotencyService.reportError(req);
