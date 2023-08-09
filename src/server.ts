@@ -3,8 +3,8 @@ import { getSharedIdempotencyService, idempotency } from "express-idempotency";
 import axios from "axios";
 import cors from "cors";
 import env from "dotenv";
-import pino from 'pino'
-import expressPino from 'express-pino-logger'
+import pino from "pino";
+import expressPino from "express-pino-logger";
 import QuickLRU from 'quick-lru';
 
 
@@ -20,12 +20,10 @@ app.use(cors());
 
 const PORT = process.env.PORT || 30002;
 
-const logger = pino({}, pino.destination('./pe.log'))
-const logRequest = expressPino(
-  {logger: logger, autoLogging: true,}
-  )
+const logger = pino({}, pino.destination("./pe.log"));
+const logRequest = expressPino({ logger: logger, autoLogging: true });
 
-app.use(logRequest)
+app.use(logRequest);
 
 // const logger = pino({})
 // const alchemyLogger = expressPino({logger})
@@ -100,8 +98,9 @@ app.use((req:Request, res:Response, next:NextFunction) => {
   next()
 })
 
-
-app.post('/sepolia', async (req: Request, res: Response, next:NextFunction) => {
+app.post(
+  "/sepolia",
+  async (req: Request, res: Response, next: NextFunction) => {
     const startTime = Date.now();
     res.on("finish", () => {
       const endTime = Date.now();
@@ -168,7 +167,6 @@ app.post('/sepolia', async (req: Request, res: Response, next:NextFunction) => {
     }
   }
 );
-
 
 app.post("/mumbai", async (req: Request, res: Response, next: NextFunction) => {
   const startTime = Date.now();
