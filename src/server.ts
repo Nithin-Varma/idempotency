@@ -77,6 +77,9 @@ interface PendingRequests {
 }
 const pendingRequests: PendingRequests = {};
 
+app.get("/ping", async (req: Request, res: Response, next: NextFunction) => {
+  res.send("pong");
+});
 // app.use((req: Request, res:Response, next:NextFunction) => {
 //   const key = req.headers['idempotency'] as string;
 //   if(key && pendingRequests[key]) {
@@ -185,53 +188,53 @@ app.post(
 );
 const snooze = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms));
 
-app.post("/mumbai", async (req: Request, res: Response, next: NextFunction) => {
-  const key = req.headers["idempotency"];
+// app.post("/mumbai", async (req: Request, res: Response, next: NextFunction) => {
+//   const key = req.headers["idempotency"];
 
-  // const cached = cache.get(key);
-  // if (cached) {
-  //   return res.send(cached);
-  // }
+//   // const cached = cache.get(key);
+//   // if (cached) {
+//   //   return res.send(cached);
+//   // }
 
-  // const startTime = Date.now();
-  // res.on("finish", () => {
-  //   const endTime = Date.now();
-  //   const requestTime = endTime - startTime;
-  //   console.log(`Request fulfilled in ${requestTime}ms`);
-  // });
-  const body = req.body;
+//   // const startTime = Date.now();
+//   // res.on("finish", () => {
+//   //   const endTime = Date.now();
+//   //   const requestTime = endTime - startTime;
+//   //   console.log(`Request fulfilled in ${requestTime}ms`);
+//   // });
+//   const body = req.body;
 
-  const release = await mutex.acquire();
-  try {
-    const cachedResult = await cache.get(key);
-    if (cachedResult) {
-      console.log("Cache hit with value", { cachedResult });
-      res.send(cachedResult);
-      return;
-    }
+//   const release = await mutex.acquire();
+//   try {
+//     const cachedResult = await cache.get(key);
+//     if (cachedResult) {
+//       console.log("Cache hit with value", { cachedResult });
+//       res.send(cachedResult);
+//       return;
+//     }
 
-    const response = await axios.post(
-      `https://polygon-mumbai.g.alchemy.com/v2/${process.env.MUMBAI_KEY}`,
-      body,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    cache.set(key, response.data);
-    console.log(
-      "dhek, now we are fetching the data from the api, because we didnt have any already fetched data..."
-    );
-    console.log(response.data);
-    res.send(response.data);
-    console.log("hi i run after send");
-  } catch (error) {
-    res.status(500).send(`Internal Server Error ${error}`);
-  } finally {
-    release();
-  }
-});
+//     const response = await axios.post(
+//       `https://polygon-mumbai.g.alchemy.com/v2/${process.env.MUMBAI_KEY}`,
+//       body,
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//       }
+//     );
+//     cache.set(key, response.data);
+//     console.log(
+//       "dhek, now we are fetching the data from the api, because we didnt have any already fetched data..."
+//     );
+//     console.log(response.data);
+//     res.send(response.data);
+//     console.log("hi i run after send");
+//   } catch (error) {
+//     res.status(500).send(`Internal Server Error ${error}`);
+//   } finally {
+//     release();
+//   }
+// });
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
