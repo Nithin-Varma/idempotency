@@ -4,7 +4,8 @@ import axios from "axios";
 import cors from "cors";
 import env from "dotenv";
 import pino from "pino";
-import expressPino from "express-pino-logger";
+// import expressPino from "express-pino-logger";
+import logger from "pino-http";
 import QuickLRU from "quick-lru";
 import { Mutex } from "async-mutex";
 env.config();
@@ -13,9 +14,15 @@ app.use(express.json());
 app.use(cors());
 const PORT = process.env.PORT || 30002;
 
-const logger = pino({}, pino.destination("./mumbai.log"));
-const logRequest = expressPino({ logger: logger, autoLogging: true });
-app.use(logRequest);
+// const logger = pino({}, pino.destination("./mumbai.log"));
+// const logRequest = expressPino({ logger: logger, autoLogging: true });
+const log = logger(
+  {
+    autoLogging: true,
+  },
+  pino.destination("./mumbai.log")
+);
+app.use(log);
 const cache = new QuickLRU({
   maxSize: 100000000,
 });
@@ -54,7 +61,7 @@ axios.interceptors.response.use(
       response.config["metadata"].endTime -
       //@ts-ignore
       response.config["metadata"].startTime;
-    logger.info({
+    log.logger.info({
       message: {
         url: response.config.url,
         duration: duration,
