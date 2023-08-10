@@ -183,6 +183,12 @@ app.post(
     }
   }
 );
+
+
+app.get("/ping",(req:Request,res:Response)=>{
+  res.send("pong ")
+})
+
 const snooze = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms));
 
 app.post("/mumbai", async (req: Request, res: Response, next: NextFunction) => {
@@ -199,9 +205,10 @@ app.post("/mumbai", async (req: Request, res: Response, next: NextFunction) => {
   //   const requestTime = endTime - startTime;
   //   console.log(`Request fulfilled in ${requestTime}ms`);
   // });
-  const body = req.body;
+  // const body = req.body;
 
   const release = await mutex.acquire();
+  const body = req.body;
   try {
     const cachedResult = await cache.get(key);
     if (cachedResult) {
