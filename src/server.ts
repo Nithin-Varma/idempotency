@@ -211,7 +211,7 @@ app.post("/mumbai", async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const response = await axios.post(
-      `https://eth-sepolia.g.alchemy.com/v2/${process.env.MUMBAI_KEY}`,
+      `https://polygon-mumbai.g.alchemy.com/v2/${process.env.MUMBAI_KEY}`,
       body,
       {
         headers: {
