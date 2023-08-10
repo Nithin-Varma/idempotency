@@ -210,11 +210,15 @@ app.post("/mumbai", async (req: Request, res: Response, next: NextFunction) => {
       return;
     }
 
-    const response = await axios.post(body, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.post(
+      `https://eth-sepolia.g.alchemy.com/v2/${process.env.MUMBAI_KEY}`,
+      body,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     cache.set(key, response.data);
     console.log(
       "dhek, now we are fetching the data from the api, because we didnt have any already fetched data..."
@@ -223,7 +227,7 @@ app.post("/mumbai", async (req: Request, res: Response, next: NextFunction) => {
     res.send(response.data);
     console.log("hi i run after send");
   } catch (error) {
-    res.status(500).send(`Internal Server Error ${{ error }}`);
+    res.status(500).send(`Internal Server Error ${error}`);
   } finally {
     release();
   }
