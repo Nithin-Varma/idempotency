@@ -9,6 +9,8 @@ import logger from "pino-http";
 import QuickLRU from "quick-lru";
 import { Mutex } from "async-mutex";
 env.config();
+const createSonicBoom = (dest: string) =>
+  pino.destination({ dest: dest, append: true, sync: true });
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -20,7 +22,10 @@ const log = logger(
   {
     autoLogging: true,
   },
-  pino.destination("./mumbai.log")
+
+  pino.multistream({
+    stream: createSonicBoom("./mumbai.log"),
+  })
 );
 app.use(log);
 const cache = new QuickLRU({
