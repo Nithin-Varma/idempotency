@@ -23,9 +23,7 @@ const log = logger(
     autoLogging: true,
   },
 
-  pino.multistream({
-    stream: createSonicBoom("./mumbai.log"),
-  })
+  pino.destination("./pe.log")
 );
 app.use(log);
 const cache = new QuickLRU({
